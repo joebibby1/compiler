@@ -1,0 +1,14 @@
+/Users/joebibby/Documents/Compiler/Compiler.Main/bin/Debug/net8.0/Compiler.Main
+/Users/joebibby/Documents/Compiler/Compiler.Main/bin/Debug/net8.0/Compiler.Main.deps.json
+/Users/joebibby/Documents/Compiler/Compiler.Main/bin/Debug/net8.0/Compiler.Main.runtimeconfig.json
+/Users/joebibby/Documents/Compiler/Compiler.Main/bin/Debug/net8.0/Compiler.Main.dll
+/Users/joebibby/Documents/Compiler/Compiler.Main/bin/Debug/net8.0/Compiler.Main.pdb
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.GeneratedMSBuildEditorConfig.editorconfig
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.AssemblyInfoInputs.cache
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.AssemblyInfo.cs
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.csproj.CoreCompileInputs.cache
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.dll
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/refint/Compiler.Main.dll
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.pdb
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.genruntimeconfig.cache
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/ref/Compiler.Main.dll
