@@ -7,19 +7,26 @@ namespace Parse;
 // STATEMENT GRAMMAR
 // program        → declaration* EOF ;
 // declaration    → varDecl | statement ;
-// statement      → exprStmt | printStmt | block ;
+// statement      → exprStmt | printStmt | block | ifStmt ;
+// if statement   → "if" "(" expression ")" statement ( "else" statement )? ;
 // block          → "{" declaration* "}" ;
 // varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
 
 
 
 // EXPRESSION GRAMMAR
-// expression     → term ;
+// expression     → assignment ;
+// assignment     → IDENTIFIER "=" assignment | equality ;
+// logic_or       → logic_and ( "or" logic_and )* ;
+// logic_and      → equality ( "and" equality )* ;
+// equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+// comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 // term           → factor ( ( "-" | "+" ) factor )* ;
 // factor         → primary ( ( "/" | "*" ) primary )* ;
 // primary        → NUMBER | "(" expression ")" | IDENTIFIER ;
 
-
+// need to add: comparison
+// todo: put the parsing methods in order of precedence in the grammar rules
 
 
 public class Parser(List<Token> tokens)
@@ -113,12 +120,31 @@ public class Parser(List<Token> tokens)
         {
             return PrintStatement();
         }
+        if (Match([TokenType.IF]))
+        {
+            return IfStatement();
+        }
         if (Match([TokenType.LEFT_BRACE]))
         {
             return Block();
         }
         // The default case is expression statement, this is more difficult to ascertain from the first token
         return ExpressionStatement();
+    }
+
+    private IfStmt IfStatement()
+    {
+        Consume(TokenType.LEFT_PAREN, "Expected '(' after 'if'.");
+        Expr condition = Expression();
+        Consume(TokenType.RIGHT_PAREN, "Expected ')' after if condition.");
+        // We dont allow variable declarations inside control flow statements. So this is Statement() not Declaration()
+        Stmt thenBranch = Statement();
+        Stmt? elseBranch = null;
+        if (Match([TokenType.ELSE]))
+        {
+            elseBranch = Statement();
+        }
+        return new IfStmt(condition, thenBranch, elseBranch);
     }
 
     private Stmt Block()
@@ -149,9 +175,17 @@ public class Parser(List<Token> tokens)
         }
     }
 
+    // These parsing methods are in order of precedence in the grammar rules. 
+    // This call stack goes from the top to the bottom of the syntax tree.
+    // When it reaches the bottom (the terminals of the language) it will return a value and the call frames will begin popping off the stack.
+    private Expr Expression()
+    {
+        return Assignment();
+    }
+
     private Expr Assignment()
     {
-        Expr expr = Equality();
+        Expr expr = Or();
         if (Match([TokenType.EQUAL]))
         {
             Token equals = Previous();
@@ -165,6 +199,31 @@ public class Parser(List<Token> tokens)
         }
         return expr;
 
+    }
+
+    private Expr Or()
+    {
+        Expr expr = And();
+        while (Match([TokenType.OR]))
+        {
+            var op = Previous();
+            var right = And();
+            expr = new LogicalExpr(expr, op, right);
+        }
+        return expr;
+    }
+
+    private Expr And()
+    {
+        Expr expr = Equality();
+        // If there is no AND token here, this just falls through to equality.
+        while (Match([TokenType.AND]))
+        {
+            var op = Previous();
+            var right = Equality();
+            expr = new LogicalExpr(expr, op, right);
+        }
+        return expr;
     }
 
     private Expr Equality()
@@ -230,13 +289,6 @@ public class Parser(List<Token> tokens)
         return new ExprStmt(value);
     }
 
-    // These parsing methods are in order of precedence in the grammar rules. 
-    // This call stack goes from the top to the bottom of the syntax tree.
-    // When it reaches the bottom (the terminals of the language) it will return a value and the call frames will begin popping off the stack.
-    private Expr Expression()
-    {
-        return Term();
-    }
 
     private Expr Term()
     {

@@ -7,10 +7,10 @@ public enum TokenType
     // operators
     PLUS, MINUS, MULT, DIV, EQUAL, EQUAL_EQUAL, BANG_EQUAL,
     // keywords
-    PRINT, VAR,
+    PRINT, VAR, IF, ELSE, OR, AND,
     // identifiers
     IDENTIFIER,
     // punctuation
-    SEMICOLON, LEFT_BRACE, RIGHT_BRACE,
+    SEMICOLON, LEFT_BRACE, RIGHT_BRACE, LEFT_PAREN, RIGHT_PAREN,
     EOF
 }

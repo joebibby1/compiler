@@ -12,7 +12,11 @@ public class Lexer(string input)
     private readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>()
     {
         {"print", TokenType.PRINT},
-        {"var", TokenType.VAR}
+        {"var", TokenType.VAR},
+        {"if", TokenType.IF},
+        {"else", TokenType.ELSE},
+        {"or", TokenType.OR},
+        {"and", TokenType.AND},
     };
 
     public List<Token> ScanTokens()
@@ -81,6 +85,12 @@ public class Lexer(string input)
                 break;
             case '}':
                 AddToken(TokenType.RIGHT_BRACE, "}", line, null);
+                break;
+            case '(':
+                AddToken(TokenType.LEFT_PAREN, "(", line, null);
+                break;
+            case ')':
+                AddToken(TokenType.RIGHT_PAREN, ")", line, null);
                 break;
             default:
                 if (IsDigit(c))

@@ -13,18 +13,19 @@ public class Env(Env? enclosing = null)
         variables[name] = value;
     }
 
-    public void Assign(Token identifier, object value)
+    public object Assign(Token identifier, object value)
     {
         // here we want to assign the variable if it exists in local scope. Otherwise we want to assign it to enclosing scope
         // If it does not exist in any enclosing scope we want to throw a runtime exception
         if (variables.ContainsKey(identifier.Lexeme))
         {
             variables[identifier.Lexeme] = value;
+            return value;
         }
 
         if (enclosing != null)
         {
-            enclosing.Assign(identifier, value);
+            return enclosing.Assign(identifier, value);
         }
 
         throw new RuntimeException(identifier, "Undefined variable: " + identifier.Lexeme + '.');

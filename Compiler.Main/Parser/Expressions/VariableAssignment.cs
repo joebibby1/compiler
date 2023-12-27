@@ -10,8 +10,8 @@ namespace Parse;
 /// </summary>
 class VarAssignExpr(Token identifier, object value) : Expr
 {
-    public void Evaluate(Env? env)
+    public override object Evaluate(Env? env)
     {
-        env!.Assign(identifier, value);
+        return env!.Assign(identifier, value);
     }
 }

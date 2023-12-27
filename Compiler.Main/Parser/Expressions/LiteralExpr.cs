@@ -4,7 +4,6 @@ using Interpret;
 using Lex;
 
 
-
 class LiteralExpr(Token literal) : Expr
 {
 
