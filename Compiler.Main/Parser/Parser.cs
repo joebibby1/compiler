@@ -25,7 +25,7 @@ namespace Parse;
 // factor         → primary ( ( "/" | "*" ) primary )* ;
 // primary        → NUMBER | "(" expression ")" | IDENTIFIER ;
 
-// need to add: comparison
+// need to add: comparison, false/null tokens
 // todo: put the parsing methods in order of precedence in the grammar rules
 
 
@@ -42,6 +42,8 @@ public class Parser(List<Token> tokens)
         }
         return statements;
     }
+
+    // --- UTILITIES ---
 
     /// <summary>
     /// Return the current token without consuming it 
@@ -113,6 +115,58 @@ public class Parser(List<Token> tokens)
         return false;
     }
 
+    private void Synchronise()
+    {
+        Advance();
+        while (!IsAtEnd())
+        {
+            if (Previous().Type == TokenType.SEMICOLON)
+            {
+                return;
+            }
+            switch (Peek().Type)
+            {
+                // If we find one of these keywords, we know we are at the start of a new statement
+                case TokenType.PRINT:
+                case TokenType.VAR:
+                    return;
+            }
+            Advance();
+        }
+    }
+
+    // --- STATEMENTS ---
+
+    private Stmt? Declaration()
+    {
+        try
+        {
+            if (Match([TokenType.VAR]))
+            {
+                return VarDeclaration();
+            }
+            return Statement();
+        }
+        catch (ParseException)
+        {
+            Synchronise();
+            return null;
+        }
+    }
+
+    private Stmt VarDeclaration()
+    {
+        Token identifier = Consume(TokenType.IDENTIFIER, "Expected identifier.");
+        Expr initializer = null!;
+        // If we see an equals we know the variable is being initialise, otherwise its value will be set to null.
+        if (Match([TokenType.EQUAL]))
+        {
+            initializer = Expression();
+        }
+        Consume(TokenType.SEMICOLON, "Expected ';' after variable declaration.");
+        return new VarDecl(identifier, initializer!);
+    }
+
     private Stmt Statement()
     {
         // If the first token is PRINT, we know this is a print statement
@@ -130,6 +184,22 @@ public class Parser(List<Token> tokens)
         }
         // The default case is expression statement, this is more difficult to ascertain from the first token
         return ExpressionStatement();
+    }
+
+    private Stmt PrintStatement()
+    {
+        var value = Expression();
+        Consume(TokenType.SEMICOLON, "Expected ';' after value.");
+        return new PrintStmt(value);
+    }
+
+    private Stmt ExpressionStatement()
+    {
+        // Creates syntax tree for the expression before the semicolon and returns it
+        var value = Expression();
+        // Consume the semicolon when done parsing, so that we can parse the next statement
+        Consume(TokenType.SEMICOLON, "Expected ';' after value.");
+        return new ExprStmt(value);
     }
 
     private IfStmt IfStatement()
@@ -158,22 +228,7 @@ public class Parser(List<Token> tokens)
         return new BlockStmt(statements);
     }
 
-    private Stmt? Declaration()
-    {
-        try
-        {
-            if (Match([TokenType.VAR]))
-            {
-                return VarDeclaration();
-            }
-            return Statement();
-        }
-        catch (ParseException)
-        {
-            Synchronise();
-            return null;
-        }
-    }
+    // --- EXPRESSIONS ---
 
     // These parsing methods are in order of precedence in the grammar rules. 
     // This call stack goes from the top to the bottom of the syntax tree.
@@ -240,54 +295,7 @@ public class Parser(List<Token> tokens)
         return expr;
     }
 
-    private void Synchronise()
-    {
-        Advance();
-        while (!IsAtEnd())
-        {
-            if (Previous().Type == TokenType.SEMICOLON)
-            {
-                return;
-            }
-            switch (Peek().Type)
-            {
-                // If we find one of these keywords, we know we are at the start of a new statement
-                case TokenType.PRINT:
-                case TokenType.VAR:
-                    return;
-            }
-            Advance();
-        }
-    }
-
-    private Stmt VarDeclaration()
-    {
-        Token identifier = Consume(TokenType.IDENTIFIER, "Expected identifier.");
-        Expr initializer = null!;
-        // If we see an equals we know the variable is being initialise, otherwise its value will be set to null.
-        if (Match([TokenType.EQUAL]))
-        {
-            initializer = Expression();
-        }
-        Consume(TokenType.SEMICOLON, "Expected ';' after variable declaration.");
-        return new VarDecl(identifier, initializer!);
-    }
-
-    private Stmt PrintStatement()
-    {
-        var value = Expression();
-        Consume(TokenType.SEMICOLON, "Expected ';' after value.");
-        return new PrintStmt(value);
-    }
-
-    private Stmt ExpressionStatement()
-    {
-        // Creates syntax tree for the expression before the semicolon and returns it
-        var value = Expression();
-        // Consume the semicolon when done parsing, so that we can parse the next statement
-        Consume(TokenType.SEMICOLON, "Expected ';' after value.");
-        return new ExprStmt(value);
-    }
+    // need  to add comparison in here
 
 
     private Expr Term()
