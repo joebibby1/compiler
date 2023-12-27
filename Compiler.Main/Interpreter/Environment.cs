@@ -4,33 +4,45 @@ using Lex;
 namespace Interpret;
 
 
-class Env
+public class Env(Env? enclosing = null)
 {
-    private Dictionary<string, Object> variables = new Dictionary<string, Object>();
+    private Dictionary<string, object> variables = new Dictionary<string, object>();
 
-    public void Define(string name, Object value)
+    public void Define(string name, object value)
     {
         variables[name] = value;
     }
 
-    public Object Assign(Token identifier, Object value)
+    public void Assign(Token identifier, object value)
     {
-        if (!variables.ContainsKey(identifier.Lexeme))
+        // here we want to assign the variable if it exists in local scope. Otherwise we want to assign it to enclosing scope
+        // If it does not exist in any enclosing scope we want to throw a runtime exception
+        if (variables.ContainsKey(identifier.Lexeme))
         {
-            throw new RuntimeException(identifier, "Variable name does not exist");
+            variables[identifier.Lexeme] = value;
         }
 
-        variables[identifier.Lexeme] = value;
+        if (enclosing != null)
+        {
+            enclosing.Assign(identifier, value);
+        }
 
-        return value;
+        throw new RuntimeException(identifier, "Undefined variable: " + identifier.Lexeme + '.');
     }
 
-    public Object Get(Token identifier)
+    public object Get(Token identifier)
     {
         if (variables.ContainsKey(identifier.Lexeme))
         {
             return variables[identifier.Lexeme];
         }
+
+        // we recursively search the outer enclosing scopes to see if the variable is in any of them
+        if (enclosing != null)
+        {
+            return enclosing.Get(identifier);
+        }
+
         throw new SyntaxException(identifier, "Undefined variable " + identifier.Lexeme + '.');
     }
 }

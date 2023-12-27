@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Exception;
 using Lex;
 
@@ -8,7 +7,8 @@ namespace Parse;
 // STATEMENT GRAMMAR
 // program        → declaration* EOF ;
 // declaration    → varDecl | statement ;
-// statement      → exprStmt | printStmt ;
+// statement      → exprStmt | printStmt | block ;
+// block          → "{" declaration* "}" ;
 // varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
 
 
@@ -22,7 +22,7 @@ namespace Parse;
 
 
 
-class Parser(List<Token> tokens)
+public class Parser(List<Token> tokens)
 {
     private int current = 0;
 
@@ -113,15 +113,30 @@ class Parser(List<Token> tokens)
         {
             return PrintStatement();
         }
+        if (Match([TokenType.LEFT_BRACE]))
+        {
+            return Block();
+        }
         // The default case is expression statement, this is more difficult to ascertain from the first token
         return ExpressionStatement();
+    }
+
+    private Stmt Block()
+    {
+        List<Stmt> statements = new List<Stmt>();
+        while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+        {
+            statements.Add(Declaration());
+        }
+        Consume(TokenType.RIGHT_BRACE, "Expected '}' after block.");
+        return new BlockStmt(statements);
     }
 
     private Stmt? Declaration()
     {
         try
         {
-            if (Match([TokenType.IDENTIFIER]))
+            if (Match([TokenType.VAR]))
             {
                 return VarDeclaration();
             }
@@ -190,6 +205,7 @@ class Parser(List<Token> tokens)
     {
         Token identifier = Consume(TokenType.IDENTIFIER, "Expected identifier.");
         Expr initializer = null!;
+        // If we see an equals we know the variable is being initialise, otherwise its value will be set to null.
         if (Match([TokenType.EQUAL]))
         {
             initializer = Expression();
@@ -211,7 +227,7 @@ class Parser(List<Token> tokens)
         var value = Expression();
         // Consume the semicolon when done parsing, so that we can parse the next statement
         Consume(TokenType.SEMICOLON, "Expected ';' after value.");
-        return new ExpressionStmt(value);
+        return new ExprStmt(value);
     }
 
     // These parsing methods are in order of precedence in the grammar rules. 

@@ -3,12 +3,10 @@ using Interpret;
 namespace Parse;
 
 
-
-class ExpressionStmt(Expr expr) : Stmt
+public class PrintStmt(Expr expr) : Stmt
 {
-
     public override void Execute(Env? env = null)
     {
-        expr.Evaluate(env);
+        Console.WriteLine(expr.Evaluate(env).ToString());
     }
 }

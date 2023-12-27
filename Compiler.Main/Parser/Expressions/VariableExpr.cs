@@ -3,7 +3,10 @@ using Interpret;
 
 namespace Parse;
 
-
+/// <summary>
+/// Expression for variable references. Evaluates to the value of the variable in the environment. This is the expression 
+/// used when we want to access the value of a variable.
+/// </summary>
 class VarExpr(Token identifier) : Expr
 {
 
@@ -14,7 +17,7 @@ class VarExpr(Token identifier) : Expr
         return "(" + identifier.Lexeme + ")";
     }
 
-    public override Object Evaluate(Env? env)
+    public override object Evaluate(Env? env)
     {
         return env!.Get(identifier);
     }

@@ -12,3 +12,4 @@
 /Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.pdb
 /Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.genruntimeconfig.cache
 /Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/ref/Compiler.Main.dll
+/Users/joebibby/Documents/Compiler/Compiler.Main/obj/Debug/net8.0/Compiler.Main.sourcelink.json

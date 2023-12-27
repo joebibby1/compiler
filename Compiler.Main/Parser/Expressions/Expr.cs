@@ -4,16 +4,16 @@ namespace Parse;
 
 
 
-class Expr
+public class Expr
 {
     public virtual string Parenthesise()
     {
         return "";
     }
 
-    public virtual Object Evaluate(Env? env = null)
+    public virtual object Evaluate(Env? env = null)
     {
-        return new Object();
+        return new object();
     }
 
     public virtual string PrintFormat()

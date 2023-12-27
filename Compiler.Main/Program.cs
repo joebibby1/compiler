@@ -7,10 +7,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        var input = @"
-                    var a = 4;
-                    print a;
-                ";
+        var input = @"var a = 1;";
         var lexer = new Lexer(input);
 
         var tokens = lexer.ScanTokens();

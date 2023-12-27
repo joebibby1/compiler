@@ -2,7 +2,7 @@ using Interpret;
 
 namespace Parse;
 
-abstract class Stmt
+public abstract class Stmt
 {
     // public virtual void Execute()
     // {

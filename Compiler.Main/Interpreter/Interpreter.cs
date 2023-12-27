@@ -8,12 +8,12 @@ class Interpreter
     private Env env = new Env();
 
 
-    public void DefineVar(string lexeme, Object value)
+    public void DefineVar(string lexeme, object value)
     {
         env.Define(lexeme, value);
     }
 
-    public Object GetVar(Token token)
+    public object GetVar(Token token)
     {
         return env.Get(token);
     }

@@ -16,7 +16,7 @@ class BinaryExpr(Expr left, Token op, Expr right) : Expr
         return "(" + Op.Lexeme + " " + Left.Parenthesise() + " " + Right.Parenthesise() + ")";
     }
 
-    private void CheckNumberOperands(Token op, Object operand, Object operand2)
+    private void CheckNumberOperands(Token op, object operand, object operand2)
     {
         if (operand is int && operand2 is int)
         {
@@ -25,7 +25,7 @@ class BinaryExpr(Expr left, Token op, Expr right) : Expr
         throw new RuntimeException(op, "Operands must be numbers.");
     }
 
-    public override Object Evaluate(Env? env = null)
+    public override object Evaluate(Env? env = null)
     {
         // Check for type errors at runtime
         var left = Left.Evaluate(env);
@@ -43,7 +43,7 @@ class BinaryExpr(Expr left, Token op, Expr right) : Expr
             case TokenType.DIV:
                 return (int)left / (int)right;
             default:
-                return new Object();
+                return new object();
         }
     }
 }

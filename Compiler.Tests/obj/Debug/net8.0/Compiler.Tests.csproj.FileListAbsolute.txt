@@ -102,3 +102,4 @@
 /Users/joebibby/Documents/Compiler/Compiler.Tests/obj/Debug/net8.0/Compiler.Tests.pdb
 /Users/joebibby/Documents/Compiler/Compiler.Tests/obj/Debug/net8.0/Compiler.Tests.genruntimeconfig.cache
 /Users/joebibby/Documents/Compiler/Compiler.Tests/obj/Debug/net8.0/ref/Compiler.Tests.dll
+/Users/joebibby/Documents/Compiler/Compiler.Tests/obj/Debug/net8.0/Compiler.Tests.sourcelink.json

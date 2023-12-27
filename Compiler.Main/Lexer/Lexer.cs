@@ -76,6 +76,12 @@ public class Lexer(string input)
             case ';':
                 AddToken(TokenType.SEMICOLON, ";", line, null);
                 break;
+            case '{':
+                AddToken(TokenType.LEFT_BRACE, "{", line, null);
+                break;
+            case '}':
+                AddToken(TokenType.RIGHT_BRACE, "}", line, null);
+                break;
             default:
                 if (IsDigit(c))
                 {

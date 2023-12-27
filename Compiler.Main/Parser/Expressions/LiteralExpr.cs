@@ -2,6 +2,9 @@ namespace Parse;
 
 using Interpret;
 using Lex;
+
+
+
 class LiteralExpr(Token literal) : Expr
 {
 
@@ -14,7 +17,7 @@ class LiteralExpr(Token literal) : Expr
         return "(" + literal.Lexeme + ")";
     }
 
-    public override Object Evaluate(Env? env = null)
+    public override object Evaluate(Env? env = null)
     {
         return Value!;
     }
