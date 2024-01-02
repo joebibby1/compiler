@@ -11,6 +11,6 @@ public enum TokenType
     // identifiers
     IDENTIFIER,
     // punctuation
-    SEMICOLON, LEFT_BRACE, RIGHT_BRACE, LEFT_PAREN, RIGHT_PAREN,
+    SEMICOLON, LEFT_BRACE, RIGHT_BRACE, LEFT_PAREN, RIGHT_PAREN, COMMA,
     EOF
 }

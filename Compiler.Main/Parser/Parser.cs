@@ -27,6 +27,7 @@ namespace Parse;
 // comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 // term           → factor ( ( "-" | "+" ) factor )* ;
 // factor         → primary ( ( "/" | "*" ) primary )* ;
+// call           → primary ( "(" arguments? ")" )* ;
 // primary        → NUMBER | "(" expression ")" | IDENTIFIER | "true" | "false" ;
 
 // need to add: comparison(including equality), false/null tokens, strings
@@ -408,7 +409,7 @@ public class Parser(List<Token> tokens)
 
     private Expr Factor()
     {
-        var expr = Primary();
+        var expr = Call();
         while (Match([TokenType.MULT, TokenType.DIV]))
         {
             var op = Previous();
@@ -418,6 +419,29 @@ public class Parser(List<Token> tokens)
 
         return expr;
 
+    }
+
+    private Expr Call()
+    {
+        var expr = Primary();
+        while (Match([TokenType.LEFT_PAREN]))
+        {
+            List<Expr> arguments = new List<Expr>();
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (arguments.Count >= 255)
+                    {
+                        Logger.LogException(Peek(), "Cannot have more than 255 arguments.");
+                    }
+                    arguments.Add(Expression());
+                } while (Match([TokenType.COMMA]));
+            }
+            Token rightParen = Consume(TokenType.RIGHT_PAREN, "Expected ')' after arguments.");
+            expr = new CallExpr(expr, rightParen, arguments);
+        }
+        return expr;
     }
 
     private Expr Primary()

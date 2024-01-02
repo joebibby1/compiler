@@ -108,6 +108,9 @@ public class Lexer(string input)
             case ')':
                 AddToken(TokenType.RIGHT_PAREN, ")", line, null);
                 break;
+            case ',':
+                AddToken(TokenType.COMMA, ",", line, null);
+                break;
             case '!':
                 if (Match('='))
                 {
