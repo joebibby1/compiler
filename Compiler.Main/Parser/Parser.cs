@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Exception;
 using Lex;
 
@@ -28,7 +27,7 @@ namespace Parse;
 // comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 // term           → factor ( ( "-" | "+" ) factor )* ;
 // factor         → primary ( ( "/" | "*" ) primary )* ;
-// primary        → NUMBER | "(" expression ")" | IDENTIFIER ;
+// primary        → NUMBER | "(" expression ")" | IDENTIFIER | "true" | "false" ;
 
 // need to add: comparison(including equality), false/null tokens, strings
 // todo: put the parsing methods in order of precedence in the grammar rules
@@ -238,6 +237,7 @@ public class Parser(List<Token> tokens)
         {
             increment = Expression();
         }
+        Consume(TokenType.RIGHT_PAREN, "Expected ')' after for clauses.");
 
         Stmt body = Statement();
 
@@ -364,7 +364,7 @@ public class Parser(List<Token> tokens)
 
     private Expr Equality()
     {
-        Expr expr = Term();
+        Expr expr = Comparison();
 
         while (Match([TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL]))
         {
@@ -377,6 +377,18 @@ public class Parser(List<Token> tokens)
     }
 
     // need  to add comparison in here
+    private Expr Comparison()
+    {
+        var expr = Term();
+        while (Match([TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL]))
+        {
+            var op = Previous();
+            var right = Term();
+            expr = new BinaryExpr(expr, op, right);
+        }
+
+        return expr;
+    }
 
 
     private Expr Term()
@@ -410,7 +422,7 @@ public class Parser(List<Token> tokens)
 
     private Expr Primary()
     {
-        if (Match([TokenType.NUM]))
+        if (Match([TokenType.NUM, TokenType.TRUE, TokenType.FALSE]))
         {
             return new LiteralExpr(Previous());
         }
@@ -420,6 +432,4 @@ public class Parser(List<Token> tokens)
         }
         throw new ParseException("Expected expression.");
     }
-
-
 }

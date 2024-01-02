@@ -5,7 +5,7 @@ public enum TokenType
     // primitives
     NUM,
     // operators
-    PLUS, MINUS, MULT, DIV, EQUAL, EQUAL_EQUAL, BANG_EQUAL,
+    PLUS, MINUS, MULT, DIV, EQUAL, EQUAL_EQUAL, BANG_EQUAL, GREATER, GREATER_EQUAL, LESS, LESS_EQUAL, BANG,
     // keywords
     PRINT, VAR, IF, ELSE, OR, AND, WHILE, FOR, TRUE, FALSE,
     // identifiers

@@ -22,6 +22,7 @@ class BinaryExpr(Expr left, Token op, Expr right) : Expr
         {
             return;
         }
+
         throw new RuntimeException(op, "Operands must be numbers.");
     }
 
@@ -42,6 +43,14 @@ class BinaryExpr(Expr left, Token op, Expr right) : Expr
                 return (int)left * (int)right;
             case TokenType.DIV:
                 return (int)left / (int)right;
+            case TokenType.BANG_EQUAL:
+                return right != left;
+            case TokenType.EQUAL_EQUAL:
+                return right == left;
+            case TokenType.GREATER:
+                return (int)left > (int)right;
+            case TokenType.GREATER_EQUAL:
+                return (int)left >= (int)right;
             default:
                 return new object();
         }

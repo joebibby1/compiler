@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Lex;
 
 public class Lexer(string input)
@@ -16,7 +18,7 @@ public class Lexer(string input)
         {"or", TokenType.OR},
         {"and", TokenType.AND},
         {"while", TokenType.WHILE},
-        {"for", TokenType.FOR}
+        {"for", TokenType.FOR},
         {"true", TokenType.TRUE},
         {"false", TokenType.FALSE},
     };
@@ -45,6 +47,21 @@ public class Lexer(string input)
             return '\0';
         }
         return input[current];
+    }
+
+    // advances the input and returns true if the next character matches the expected character
+    private bool Match(char expected)
+    {
+        if (IsAtEnd())
+        {
+            return false;
+        }
+        if (input[current] != expected)
+        {
+            return false;
+        }
+        current++;
+        return true;
     }
 
     private void ScanToken()
@@ -76,9 +93,6 @@ public class Lexer(string input)
             case '/':
                 AddToken(TokenType.DIV, "/", line, null);
                 break;
-            case '=':
-                AddToken(TokenType.EQUAL, "=", line, null);
-                break;
             case ';':
                 AddToken(TokenType.SEMICOLON, ";", line, null);
                 break;
@@ -93,6 +107,46 @@ public class Lexer(string input)
                 break;
             case ')':
                 AddToken(TokenType.RIGHT_PAREN, ")", line, null);
+                break;
+            case '!':
+                if (Match('='))
+                {
+                    AddToken(TokenType.BANG_EQUAL, "!=", line, null);
+                }
+                else
+                {
+                    AddToken(TokenType.BANG, "!", line, null);
+                }
+                break;
+            case '=':
+                if (Match('='))
+                {
+                    AddToken(TokenType.EQUAL_EQUAL, "==", line, null);
+                }
+                else
+                {
+                    AddToken(TokenType.EQUAL, "=", line, null);
+                }
+                break;
+            case '<':
+                if (Match('='))
+                {
+                    AddToken(TokenType.LESS_EQUAL, "<=", line, null);
+                }
+                else
+                {
+                    AddToken(TokenType.LESS, "<", line, null);
+                }
+                break;
+            case '>':
+                if (Match('='))
+                {
+                    AddToken(TokenType.GREATER_EQUAL, ">=", line, null);
+                }
+                else
+                {
+                    AddToken(TokenType.GREATER, ">", line, null);
+                }
                 break;
             default:
                 if (IsDigit(c))

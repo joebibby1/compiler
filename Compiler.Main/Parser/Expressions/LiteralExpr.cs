@@ -18,6 +18,14 @@ class LiteralExpr(Token literal) : Expr
 
     public override object Evaluate(Env? env = null)
     {
+        if (Lexeme == "true")
+        {
+            return true;
+        }
+        if (Lexeme == "false")
+        {
+            return false;
+        }
         return Value!;
     }
 }
