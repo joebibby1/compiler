@@ -7,7 +7,7 @@ public enum TokenType
     // operators
     PLUS, MINUS, MULT, DIV, EQUAL, EQUAL_EQUAL, BANG_EQUAL,
     // keywords
-    PRINT, VAR, IF, ELSE, OR, AND,
+    PRINT, VAR, IF, ELSE, OR, AND, WHILE, FOR, TRUE, FALSE,
     // identifiers
     IDENTIFIER,
     // punctuation

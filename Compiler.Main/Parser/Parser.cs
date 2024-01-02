@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Exception;
 using Lex;
 
@@ -7,7 +8,11 @@ namespace Parse;
 // STATEMENT GRAMMAR
 // program        → declaration* EOF ;
 // declaration    → varDecl | statement ;
-// statement      → exprStmt | printStmt | block | ifStmt ;
+// statement      → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt ;
+// exprStmt       → expression ";" ;
+// printStmt      → "print" expression ";" ;
+// whileStmt      → "while" "(" expression ")" statement ;
+// forStmt        → "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
 // if statement   → "if" "(" expression ")" statement ( "else" statement )? ;
 // block          → "{" declaration* "}" ;
 // varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
@@ -25,7 +30,7 @@ namespace Parse;
 // factor         → primary ( ( "/" | "*" ) primary )* ;
 // primary        → NUMBER | "(" expression ")" | IDENTIFIER ;
 
-// need to add: comparison, false/null tokens
+// need to add: comparison(including equality), false/null tokens, strings
 // todo: put the parsing methods in order of precedence in the grammar rules
 
 
@@ -169,7 +174,7 @@ public class Parser(List<Token> tokens)
 
     private Stmt Statement()
     {
-        // If the first token is PRINT, we know this is a print statement
+        // These statements can be identified by their first token
         if (Match([TokenType.PRINT]))
         {
             return PrintStatement();
@@ -177,6 +182,14 @@ public class Parser(List<Token> tokens)
         if (Match([TokenType.IF]))
         {
             return IfStatement();
+        }
+        if (Match([TokenType.WHILE]))
+        {
+            return WhileStatement();
+        }
+        if (Match([TokenType.FOR]))
+        {
+            return ForStatement();
         }
         if (Match([TokenType.LEFT_BRACE]))
         {
@@ -186,14 +199,82 @@ public class Parser(List<Token> tokens)
         return ExpressionStatement();
     }
 
-    private Stmt PrintStatement()
+    private WhileStmt WhileStatement()
+    {
+        Consume(TokenType.LEFT_PAREN, "Expected '(' after 'while'.");
+        Expr condition = Expression();
+        Consume(TokenType.RIGHT_PAREN, "Expected ')' after while condition.");
+        Stmt body = Statement();
+        return new WhileStmt(condition, body);
+    }
+
+    private Stmt ForStatement()
+    {
+        Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.");
+        Stmt? initializer;
+        if (Match([TokenType.SEMICOLON]))
+        {
+            // If we immediatly hit a semicolon, the initializer has been omitted.
+            initializer = null;
+        }
+        else if (Match([TokenType.VAR]))
+        {
+            initializer = VarDeclaration();
+        }
+        else
+        {
+            initializer = ExpressionStatement();
+        }
+
+        Expr? condition = null;
+        if (!Check(TokenType.SEMICOLON))
+        {
+            condition = Expression();
+        }
+        Consume(TokenType.SEMICOLON, "Expected ';' after loop condition.");
+
+        Expr increment = null!;
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
+            increment = Expression();
+        }
+
+        Stmt body = Statement();
+
+        // if an increment is given, we need to add it to the end of the body
+        if (increment != null)
+        {
+            body = new BlockStmt(new List<Stmt> { body, new ExprStmt(increment) });
+        }
+
+        // if no condition is given the loop will run untill mnaually broken
+        if (condition == null)
+        {
+            condition = new LiteralExpr(new Token(TokenType.TRUE, "true", -1, -1));
+        }
+
+
+        // The for statement gets DESUGARED into a while statement
+        if (initializer != null)
+        {
+            body = new BlockStmt(new List<Stmt> { initializer, new WhileStmt(condition, body) });
+        }
+        else
+        {
+            body = new WhileStmt(condition, body);
+        }
+
+        return body;
+    }
+
+    private PrintStmt PrintStatement()
     {
         var value = Expression();
         Consume(TokenType.SEMICOLON, "Expected ';' after value.");
         return new PrintStmt(value);
     }
 
-    private Stmt ExpressionStatement()
+    private ExprStmt ExpressionStatement()
     {
         // Creates syntax tree for the expression before the semicolon and returns it
         var value = Expression();
@@ -217,7 +298,7 @@ public class Parser(List<Token> tokens)
         return new IfStmt(condition, thenBranch, elseBranch);
     }
 
-    private Stmt Block()
+    private BlockStmt Block()
     {
         List<Stmt> statements = new List<Stmt>();
         while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())

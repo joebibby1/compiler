@@ -1,7 +1,5 @@
 namespace Lex;
 
-//  To add: parentheses
-
 public class Lexer(string input)
 {
     private List<Token> tokens = new List<Token>();
@@ -17,6 +15,10 @@ public class Lexer(string input)
         {"else", TokenType.ELSE},
         {"or", TokenType.OR},
         {"and", TokenType.AND},
+        {"while", TokenType.WHILE},
+        {"for", TokenType.FOR}
+        {"true", TokenType.TRUE},
+        {"false", TokenType.FALSE},
     };
 
     public List<Token> ScanTokens()
