@@ -11,6 +11,6 @@ public class FuncStmt(Token name, List<Token> args, BlockStmt body) : Stmt
     public override void Execute(Env? env)
     {
         // define the new function in the current environment
-        env!.Define(Name.Lexeme, new CallableFunc(this));
+        env!.Define(Name.Lexeme, new CallableFunc(this, env));
     }
 }

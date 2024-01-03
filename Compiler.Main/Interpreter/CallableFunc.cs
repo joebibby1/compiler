@@ -1,8 +1,10 @@
+using System.Runtime.InteropServices;
 using Parse;
 
 namespace Interpret;
 
-public class CallableFunc(FuncStmt funcDecl) : Callable
+// closure is the environment in which the function was defined, so we pass it in to the constructor, so that it can be used when the function is called
+public class CallableFunc(FuncStmt funcDecl, Env closure) : Callable
 {
     public int Arity()
     {
@@ -12,7 +14,7 @@ public class CallableFunc(FuncStmt funcDecl) : Callable
     public object Call(List<object> arguments)
     {
         // create a new environment for the function
-        var localEnv = new Env();
+        var localEnv = new Env(closure);
 
         // define the values of the parameters as they are passed in to this environment
         for (var i = 0; i < Arity(); i++)
@@ -20,8 +22,14 @@ public class CallableFunc(FuncStmt funcDecl) : Callable
             localEnv.Define(funcDecl.Args[i].Lexeme, arguments[i]);
         }
 
-        // execute the function body
-        funcDecl.Body.Execute(localEnv);
+        try
+        {
+            funcDecl.Body.Execute(localEnv);
+        }
+        catch (ReturnValue returnValue)
+        {
+            return returnValue.Value;
+        }
 
         return true;
     }

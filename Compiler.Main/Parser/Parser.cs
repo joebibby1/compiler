@@ -10,7 +10,8 @@ namespace Parse;
 // declaration    → varDecl | funcDecl | statement ;
 // funcDecl       → "func" function ;
 // function       → IDENTIFIER "(" arguments? ")" block ;
-// statement      → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt ;
+// statement      → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt | returnStmt ;
+// returnStmt     → "return" expression? ";"
 // exprStmt       → expression ";" ;
 // printStmt      → "print" expression ";" ;
 // whileStmt      → "while" "(" expression ")" statement ;
@@ -186,6 +187,10 @@ public class Parser(List<Token> tokens)
         {
             return FuncDecl();
         }
+        if (Match([TokenType.RETURN]))
+        {
+            return ReturnStatement();
+        }
         if (Match([TokenType.IF]))
         {
             return IfStatement();
@@ -204,6 +209,18 @@ public class Parser(List<Token> tokens)
         }
         // The default case is expression statement, this is more difficult to ascertain from the first token
         return ExpressionStatement();
+    }
+
+    private Stmt ReturnStatement()
+    {
+        Token keyword = Previous();
+        Expr? value = null;
+        if (!Check(TokenType.SEMICOLON))
+        {
+            value = Expression();
+        }
+        Consume(TokenType.SEMICOLON, "Expected ';' after return value.");
+        return new ReturnStmt(keyword, value);
     }
 
     private Stmt FuncDecl()

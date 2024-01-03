@@ -21,7 +21,8 @@ public class Lexer(string input)
         {"for", TokenType.FOR},
         {"true", TokenType.TRUE},
         {"false", TokenType.FALSE},
-        {"func", TokenType.FUNC}
+        {"func", TokenType.FUNC},
+        {"return", TokenType.RETURN}
     };
 
     public List<Token> ScanTokens()
