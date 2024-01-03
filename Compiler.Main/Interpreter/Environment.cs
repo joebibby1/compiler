@@ -8,6 +8,12 @@ public class Env(Env? enclosing = null)
 {
     private Dictionary<string, object> variables = new Dictionary<string, object>();
 
+    // we define a static dictionary of global functions which is shared by all environments and does not change
+    private static readonly Dictionary<string, object> globals = new Dictionary<string, object>()
+    {
+        {"clock", new Clock()},
+    };
+
     public void Define(string name, object value)
     {
         variables[name] = value;
