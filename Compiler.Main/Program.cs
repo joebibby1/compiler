@@ -7,7 +7,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        var input = @"while (true) { print 2 > 4; }";
+        var input = @"func foo(x, y) {
+            print x + y;
+        }
+        foo(1, 2);";
         var lexer = new Lexer(input);
 
         var tokens = lexer.ScanTokens();

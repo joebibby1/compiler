@@ -1,3 +1,4 @@
+using System.Security.AccessControl;
 using Exception;
 using Lex;
 
@@ -6,7 +7,9 @@ namespace Parse;
 
 // STATEMENT GRAMMAR
 // program        → declaration* EOF ;
-// declaration    → varDecl | statement ;
+// declaration    → varDecl | funcDecl | statement ;
+// funcDecl       → "func" function ;
+// function       → IDENTIFIER "(" arguments? ")" block ;
 // statement      → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt ;
 // exprStmt       → expression ";" ;
 // printStmt      → "print" expression ";" ;
@@ -163,7 +166,7 @@ public class Parser(List<Token> tokens)
     {
         Token identifier = Consume(TokenType.IDENTIFIER, "Expected identifier.");
         Expr initializer = null!;
-        // If we see an equals we know the variable is being initialise, otherwise its value will be set to null.
+        // If we see an equals we know the variable is being initialised, otherwise its value will be set to null.
         if (Match([TokenType.EQUAL]))
         {
             initializer = Expression();
@@ -178,6 +181,10 @@ public class Parser(List<Token> tokens)
         if (Match([TokenType.PRINT]))
         {
             return PrintStatement();
+        }
+        if (Match([TokenType.FUNC]))
+        {
+            return FuncDecl();
         }
         if (Match([TokenType.IF]))
         {
@@ -197,6 +204,28 @@ public class Parser(List<Token> tokens)
         }
         // The default case is expression statement, this is more difficult to ascertain from the first token
         return ExpressionStatement();
+    }
+
+    private Stmt FuncDecl()
+    {
+        Token name = Consume(TokenType.IDENTIFIER, "Expected function name.");
+        Consume(TokenType.LEFT_PAREN, "Expected '(' after function name.");
+        List<Token> args = new List<Token>();
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (args.Count >= 255)
+                {
+                    Logger.LogException(Peek(), "Cannot have more than 255 arguments.");
+                }
+                args.Add(Consume(TokenType.IDENTIFIER, "Expected argument name."));
+            } while (Match([TokenType.COMMA]));
+        }
+        Consume(TokenType.RIGHT_PAREN, "Expected ')' after arguments.");
+        Consume(TokenType.LEFT_BRACE, "Expected '{' before function body.");
+        BlockStmt body = Block();
+        return new FuncStmt(name, args, body);
     }
 
     private WhileStmt WhileStatement()
