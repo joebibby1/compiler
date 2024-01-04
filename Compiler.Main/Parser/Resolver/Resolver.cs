@@ -3,7 +3,12 @@ using Lex;
 
 namespace Parse;
 
-
+// Have left this at this point:
+// - it checks variable decarations and adds them to the stack of scopes
+// - for variable usages it checks the scope distance and adds it to the variable expr
+// - i have not done the evaluation/execution part yet
+// - this involves using the scope distance when traversing the linked list of envrionments during execution
+// need to do function declarations/calls and write tests for those also
 
 public class Resolver
 {
