@@ -14,7 +14,7 @@ class ClassDeclrStmt(Token Name, List<FuncStmt> Methods) : Stmt
         Dictionary<string, CallableFunc> methods = new Dictionary<string, CallableFunc>();
         foreach (var method in Methods)
         {
-            methods.Add(method.Name.Lexeme, new CallableFunc(method, env));
+            methods.Add(method.Name.Lexeme, new CallableFunc(method, env, method.Name.Lexeme == "init"));
         }
 
         // store the class in the current scope

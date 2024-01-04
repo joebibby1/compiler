@@ -1,6 +1,8 @@
 
 
 
+using System.ComponentModel;
+
 namespace Interpret;
 
 /// <summary>
@@ -18,11 +20,19 @@ public class CallableClass(string Name, Dictionary<string, CallableFunc> methods
 
     public object Call(List<object> arguments)
     {
-        return new ClassInstance(this);
+        ClassInstance instance = new ClassInstance(this);
+        CallableFunc constructor = Methods["init"];
+        if (constructor != null)
+        {
+            constructor.Bind(instance).Call(arguments);
+        }
+        return instance;
     }
 
     public int Arity()
     {
-        return 0;
+        CallableFunc initializer = Methods["init"];
+        if (initializer == null) return 0;
+        return initializer.Arity();
     }
 }

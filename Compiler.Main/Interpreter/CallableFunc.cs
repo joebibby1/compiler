@@ -3,7 +3,7 @@ using Parse;
 namespace Interpret;
 
 // closure is the environment in which the function was defined, so we pass it in to the constructor, so that it can be used when the function is called
-public class CallableFunc(FuncStmt funcDecl, Env closure) : Callable
+public class CallableFunc(FuncStmt funcDecl, Env closure, bool isConstructor) : Callable
 {
     public int Arity()
     {
@@ -21,6 +21,7 @@ public class CallableFunc(FuncStmt funcDecl, Env closure) : Callable
             localEnv.Define(funcDecl.Args[i].Lexeme, arguments[i]);
         }
 
+        // how we handle a return statement, we throw an exception to break execution of the function
         try
         {
             funcDecl.Body.Execute(localEnv);
@@ -29,6 +30,8 @@ public class CallableFunc(FuncStmt funcDecl, Env closure) : Callable
         {
             return returnValue.Value;
         }
+
+
 
         return true;
     }
@@ -41,10 +44,10 @@ public class CallableFunc(FuncStmt funcDecl, Env closure) : Callable
     /// <summary>
     /// Creates a new environment just inside the closure which contains the instance of the class at the point the method is accessessed (NOT necessarily called).
     /// </summary>
-    public object Bind(ClassInstance instance)
+    public CallableFunc Bind(ClassInstance instance)
     {
         Env env = new Env(closure);
         env.Define("this", instance);
-        return new CallableFunc(funcDecl, env);
+        return new CallableFunc(funcDecl, env, isConstructor);
     }
 }
