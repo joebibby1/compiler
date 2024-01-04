@@ -7,9 +7,15 @@ class Program
 {
     static void Main(string[] args)
     {
-        var input = @"class test {}
-                      var testInstance = test();
-                      print testInstance;";
+        var input = @"class test {
+                        init() {
+                            print this.name;
+                        }
+                    }
+                    var newTest = test();
+                    newTest.name = 4;
+                    newTest.init();
+                    ";
         var lexer = new Lexer(input);
 
         var tokens = lexer.ScanTokens();

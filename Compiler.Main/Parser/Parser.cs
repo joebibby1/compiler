@@ -1,4 +1,3 @@
-using System.Security.AccessControl;
 using Exception;
 using Lex;
 
@@ -27,15 +26,16 @@ namespace Parse;
 
 // EXPRESSION GRAMMAR
 // expression     → assignment ;
-// assignment     → IDENTIFIER "=" assignment | equality ;
+// assignment     → ( call "." )? IDENTIFIER "=" assignment | logic_or ;
 // logic_or       → logic_and ( "or" logic_and )* ;
 // logic_and      → equality ( "and" equality )* ;
 // equality       → comparison ( ( "!=" | "==" ) comparison )* ;
 // comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 // term           → factor ( ( "-" | "+" ) factor )* ;
 // factor         → primary ( ( "/" | "*" ) primary )* ;
-// call           → primary ( "(" arguments? ")" )* ;
+// call           → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 // primary        → NUMBER | "(" expression ")" | IDENTIFIER | "true" | "false" ;
+
 
 // need to add: comparison(including equality), false/null tokens, strings
 // todo: put the parsing methods in order of precedence in the grammar rules
@@ -398,6 +398,11 @@ public class Parser(List<Token> tokens)
                 Token identifier = ((VarExpr)expr).Identifier;
                 return new VarAssignExpr(identifier, value);
             }
+            else if (expr is GetExpr)
+            {
+                GetExpr get = (GetExpr)expr;
+                return new SetExpr(get.Object, get.Name, value);
+            }
             throw new ParseException("Invalid assignment target.");
         }
         return expr;
@@ -490,22 +495,36 @@ public class Parser(List<Token> tokens)
     private Expr Call()
     {
         var expr = Primary();
-        while (Match([TokenType.LEFT_PAREN]))
+        // this while(true) loop indicates that calls and property accesses can be chained
+        while (true)
         {
-            List<Expr> arguments = new List<Expr>();
-            if (!Check(TokenType.RIGHT_PAREN))
+            if (Match([TokenType.LEFT_PAREN]))
             {
-                do
+                List<Expr> arguments = new List<Expr>();
+                if (!Check(TokenType.RIGHT_PAREN))
                 {
-                    if (arguments.Count >= 255)
+                    do
                     {
-                        Logger.LogException(Peek(), "Cannot have more than 255 arguments.");
-                    }
-                    arguments.Add(Expression());
-                } while (Match([TokenType.COMMA]));
+                        if (arguments.Count >= 255)
+                        {
+                            Logger.LogException(Peek(), "Cannot have more than 255 arguments.");
+                        }
+                        arguments.Add(Expression());
+                    } while (Match([TokenType.COMMA]));
+                }
+                Token rightParen = Consume(TokenType.RIGHT_PAREN, "Expected ')' after arguments.");
+                expr = new CallExpr(expr, rightParen, arguments);
             }
-            Token rightParen = Consume(TokenType.RIGHT_PAREN, "Expected ')' after arguments.");
-            expr = new CallExpr(expr, rightParen, arguments);
+            else if (Match([TokenType.DOT]))
+            {
+                Token name = Consume(TokenType.IDENTIFIER, "Expected property name after '.'.");
+                expr = new GetExpr(expr, name);
+            }
+            else
+            {
+                break;
+            }
+
         }
         return expr;
     }
@@ -519,6 +538,10 @@ public class Parser(List<Token> tokens)
         if (Match([TokenType.IDENTIFIER]))
         {
             return new VarExpr(Previous());
+        }
+        if (Match([TokenType.THIS]))
+        {
+            return new ThisExpr(Previous());
         }
         throw new ParseException("Expected expression.");
     }

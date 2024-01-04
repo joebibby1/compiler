@@ -23,7 +23,8 @@ public class Lexer(string input)
         {"false", TokenType.FALSE},
         {"func", TokenType.FUNC},
         {"return", TokenType.RETURN},
-        {"class", TokenType.CLASS}
+        {"class", TokenType.CLASS},
+        {"this", TokenType.THIS}
     };
 
     public List<Token> ScanTokens()
@@ -104,6 +105,9 @@ public class Lexer(string input)
                 break;
             case '}':
                 AddToken(TokenType.RIGHT_BRACE, "}", line, null);
+                break;
+            case '.':
+                AddToken(TokenType.DOT, ".", line, null);
                 break;
             case '(':
                 AddToken(TokenType.LEFT_PAREN, "(", line, null);

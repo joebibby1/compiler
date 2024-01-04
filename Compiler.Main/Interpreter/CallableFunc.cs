@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Parse;
 
 namespace Interpret;
@@ -37,5 +36,15 @@ public class CallableFunc(FuncStmt funcDecl, Env closure) : Callable
     public override string ToString()
     {
         return $"<fn {funcDecl.Name.Lexeme}>";
+    }
+
+    /// <summary>
+    /// Creates a new environment just inside the closure which contains the instance of the class at the point the method is accessessed (NOT necessarily called).
+    /// </summary>
+    public object Bind(ClassInstance instance)
+    {
+        Env env = new Env(closure);
+        env.Define("this", instance);
+        return new CallableFunc(funcDecl, env);
     }
 }

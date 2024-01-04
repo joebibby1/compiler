@@ -3,9 +3,13 @@
 
 namespace Interpret;
 
-public class CallableClass(string Name) : Callable
+/// <summary>
+/// This is the runtime representation of the class syntax node.
+/// </summary>
+public class CallableClass(string Name, Dictionary<string, CallableFunc> methods) : Callable
 {
     public string Name = Name;
+    public Dictionary<string, CallableFunc> Methods = methods;
 
     public override string ToString()
     {
