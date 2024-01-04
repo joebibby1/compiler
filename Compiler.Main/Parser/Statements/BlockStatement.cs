@@ -5,6 +5,7 @@ namespace Parse;
 
 public class BlockStmt(List<Stmt> statements) : Stmt
 {
+    public List<Stmt> Statements = statements;
 
     public override void Execute(Env? env = null)
     {
@@ -15,5 +16,15 @@ public class BlockStmt(List<Stmt> statements) : Stmt
         {
             statement.Execute(localEnv);
         }
+    }
+
+    public override void Resolve(Resolver resolver)
+    {
+        resolver.BeginScope();
+        foreach (var statement in statements)
+        {
+            statement.Resolve(resolver);
+        }
+        resolver.EndScope();
     }
 }

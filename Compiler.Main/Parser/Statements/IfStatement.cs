@@ -16,4 +16,14 @@ public class IfStmt(Expr condition, Stmt thenBranch, Stmt? elseBranch) : Stmt
             elseBranch.Execute(env);
         }
     }
+
+    public override void Resolve(Resolver resolver)
+    {
+        condition.Resolve(resolver);
+        thenBranch.Resolve(resolver);
+        if (elseBranch != null)
+        {
+            elseBranch.Resolve(resolver);
+        }
+    }
 }

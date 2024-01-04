@@ -16,6 +16,11 @@ public class Expr
         return new object();
     }
 
+    public virtual void Resolve(Resolver resolver)
+    {
+
+    }
+
     public virtual string PrintFormat()
     {
         return "";

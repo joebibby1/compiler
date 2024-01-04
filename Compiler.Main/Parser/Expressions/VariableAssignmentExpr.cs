@@ -14,4 +14,10 @@ class VarAssignExpr(Token identifier, Expr value) : Expr
     {
         return env!.Assign(identifier, value.Evaluate(env));
     }
+
+    public override void Resolve(Resolver resolver)
+    {
+        value.Resolve(resolver);
+        resolver.ResolveLocal(this, identifier);
+    }
 }

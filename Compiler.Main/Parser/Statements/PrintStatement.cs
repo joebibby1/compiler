@@ -9,4 +9,9 @@ public class PrintStmt(Expr expr) : Stmt
     {
         Console.WriteLine(expr.Evaluate(env).ToString());
     }
+
+    public override void Resolve(Resolver resolver)
+    {
+        expr.Resolve(resolver);
+    }
 }

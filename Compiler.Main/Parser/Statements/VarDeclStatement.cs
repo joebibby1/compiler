@@ -13,4 +13,15 @@ public class VarDecl(Token identififer, Expr initializer) : Stmt
     {
         env!.Define(identififer.Lexeme, initializer.Evaluate(env));
     }
+
+    public override void Resolve(Resolver resolver)
+    {
+        // we declare the variable in the current scope in the resolver
+        resolver.Declare(identififer);
+        if (initializer != null)
+        {
+            initializer.Resolve(resolver);
+        }
+        resolver.Define(identififer);
+    }
 }

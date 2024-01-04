@@ -17,4 +17,12 @@ public class ReturnStmt(Token keyword, Expr? value) : Stmt
         }
         throw new ReturnValue(returnValue);
     }
+
+    public override void Resolve(Resolver resolver)
+    {
+        if (Value != null)
+        {
+            Value.Resolve(resolver);
+        }
+    }
 }

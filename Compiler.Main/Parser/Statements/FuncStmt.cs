@@ -13,4 +13,11 @@ public class FuncStmt(Token name, List<Token> args, BlockStmt body) : Stmt
         // define the new function in the current environment
         env!.Define(Name.Lexeme, new CallableFunc(this, env));
     }
+
+    public override void Resolve(Resolver resolver)
+    {
+        resolver.Declare(Name);
+        resolver.Define(Name);
+        // resolver.ResolveFunction(this);
+    }
 }

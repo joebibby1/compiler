@@ -7,6 +7,7 @@ namespace Interpret;
 public class Env(Env? enclosing = null)
 {
     private Dictionary<string, object> variables = new Dictionary<string, object>();
+    public Env? Enclosing = enclosing;
 
     // we define a static dictionary of global functions which is shared by all environments and does not change
     private static readonly Dictionary<string, object> globals = new Dictionary<string, object>()
@@ -51,5 +52,21 @@ public class Env(Env? enclosing = null)
         }
 
         throw new SyntaxException(identifier, "Undefined variable " + identifier.Lexeme + '.');
+    }
+
+    private Env Ancestor(int distance)
+    {
+        Env environment = this;
+        for (int i = 0; i < distance; i++)
+        {
+            environment = environment.Enclosing!;
+        }
+
+        return environment;
+    }
+
+    public object GetAt(int distance, string name)
+    {
+        return Ancestor(distance).variables[name];
     }
 }
