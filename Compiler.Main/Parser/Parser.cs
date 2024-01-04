@@ -7,7 +7,8 @@ namespace Parse;
 
 // STATEMENT GRAMMAR
 // program        → declaration* EOF ;
-// declaration    → varDecl | funcDecl | statement ;
+// declaration    → varDecl | funcDecl | statement | classDeclr ;
+// classDeclr     → "class" IDENTIFIER "{" function* "}"
 // funcDecl       → "func" function ;
 // function       → IDENTIFIER "(" arguments? ")" block ;
 // statement      → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt | returnStmt ;
@@ -19,6 +20,8 @@ namespace Parse;
 // if statement   → "if" "(" expression ")" statement ( "else" statement )? ;
 // block          → "{" declaration* "}" ;
 // varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+// function       → IDENTIFIER "(" parameters? ")" block ;
+// parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
 
 
 
@@ -183,6 +186,10 @@ public class Parser(List<Token> tokens)
         {
             return PrintStatement();
         }
+        if (Match([TokenType.CLASS]))
+        {
+            return ClassDeclr();
+        }
         if (Match([TokenType.FUNC]))
         {
             return FuncDecl();
@@ -211,6 +218,19 @@ public class Parser(List<Token> tokens)
         return ExpressionStatement();
     }
 
+    private Stmt ClassDeclr()
+    {
+        Token name = Consume(TokenType.IDENTIFIER, "Expected class name.");
+        Consume(TokenType.LEFT_BRACE, "Expected '{' before class body.");
+        List<FuncStmt> methods = new List<FuncStmt>();
+        while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
+        {
+            methods.Add(FuncDecl());
+        }
+        Consume(TokenType.RIGHT_BRACE, "Expected '}' after class body.");
+        return new ClassDeclrStmt(name, methods);
+    }
+
     private Stmt ReturnStatement()
     {
         Token keyword = Previous();
@@ -223,7 +243,7 @@ public class Parser(List<Token> tokens)
         return new ReturnStmt(keyword, value);
     }
 
-    private Stmt FuncDecl()
+    private FuncStmt FuncDecl()
     {
         Token name = Consume(TokenType.IDENTIFIER, "Expected function name.");
         Consume(TokenType.LEFT_PAREN, "Expected '(' after function name.");

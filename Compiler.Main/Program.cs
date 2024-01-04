@@ -7,10 +7,9 @@ class Program
 {
     static void Main(string[] args)
     {
-        var input = @"func foo(x, y) {
-            print x + y;
-        }
-        foo(1, 2);";
+        var input = @"class test {}
+                      var testInstance = test();
+                      print testInstance;";
         var lexer = new Lexer(input);
 
         var tokens = lexer.ScanTokens();
