@@ -20,7 +20,7 @@ public class VarExpr(Token identifier) : Expr
 
     public override object Evaluate(Env? env)
     {
-        return env!.Get(identifier);
+        return env!.GetAt(ScopeDistance, identifier);
     }
 
     public override string PrintFormat()

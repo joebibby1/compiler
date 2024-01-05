@@ -9,7 +9,7 @@ public class Env(Env? enclosing = null)
     private Dictionary<string, object> variables = new Dictionary<string, object>();
     public Env? Enclosing = enclosing;
 
-    // we define a static dictionary of global functions which is shared by all environments and does not change
+    // we define a static dictionary of global functions which is shared by all environments and does not change. This is not the same as the top level scope, which can be written to
     private static readonly Dictionary<string, object> globals = new Dictionary<string, object>()
     {
         {"clock", new Clock()},
@@ -51,6 +51,11 @@ public class Env(Env? enclosing = null)
             return enclosing.Get(identifier);
         }
 
+        if (globals.ContainsKey(identifier.Lexeme))
+        {
+            return globals[identifier.Lexeme];
+        }
+
         throw new SyntaxException(identifier, "Undefined variable " + identifier.Lexeme + '.');
     }
 
@@ -65,8 +70,20 @@ public class Env(Env? enclosing = null)
         return environment;
     }
 
-    public object GetAt(int distance, string name)
+    public object GetAt(int distance, Token name)
     {
-        return Ancestor(distance).variables[name];
+        // -1 is the scope distance we set as default on the syntax nodes, if it is still -1 then the node has not been resolved properly
+        // may need to change this to account for global variables
+        if (distance == -1)
+        {
+            throw new RuntimeException(name, "Variable has not been resolved properly.");
+        }
+        return Ancestor(distance).variables[name.Lexeme];
+    }
+
+    public object AssignAt(int distance, Token name, object value)
+    {
+        Ancestor(distance).variables[name.Lexeme] = value;
+        return value;
     }
 }

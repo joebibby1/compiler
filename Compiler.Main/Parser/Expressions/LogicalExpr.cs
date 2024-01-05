@@ -29,4 +29,10 @@ public class LogicalExpr(Expr left, Token logicalOp, Expr right) : Expr
         // If we get to this point, then the truthiness of the whole expression depends on the truthiness of the right side.
         return right.Evaluate(env);
     }
+
+    public override void Resolve(Resolver resolver)
+    {
+        left.Resolve(resolver);
+        right.Resolve(resolver);
+    }
 }

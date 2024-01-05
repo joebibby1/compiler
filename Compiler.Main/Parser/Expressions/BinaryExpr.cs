@@ -55,4 +55,10 @@ class BinaryExpr(Expr left, Token op, Expr right) : Expr
                 return new object();
         }
     }
+
+    public override void Resolve(Resolver resolver)
+    {
+        Left.Resolve(resolver);
+        Right.Resolve(resolver);
+    }
 }

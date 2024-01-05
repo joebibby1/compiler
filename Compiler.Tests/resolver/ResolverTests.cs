@@ -8,7 +8,7 @@ public class ResolverTests
 {
 
     [Fact]
-    public void ResolveVariableDeclrWithInitializer()
+    public void ResolveVariableDeclrWithInitializer_DefinesVar()
     {
         var tokens = new Lexer("var x = 1;").ScanTokens();
         var statements = new Parser(tokens).Parse();
@@ -25,7 +25,7 @@ public class ResolverTests
     }
 
     [Fact]
-    public void ResolveVariableExpr()
+    public void ResolveVariableExpr_AssignsScopeDistanceToVar()
     {
         var input = @"
             var x = 1;
@@ -49,7 +49,7 @@ public class ResolverTests
 
     // resolves variable assignment expr
     [Fact]
-    public void ResolveVariableAssignmentExpr()
+    public void ResolveVariableAssignmentExpr_AssignsScopeDistanceToVar()
     {
         var input = @"
             var x = 1;
@@ -73,7 +73,7 @@ public class ResolverTests
 
     // resolves function declr
     [Fact]
-    public void ResolveFunctionDeclr()
+    public void ResolveFunctionDeclr_DefinesFunc()
     {
         var input = @"
             func foo() {
@@ -96,7 +96,7 @@ public class ResolverTests
 
     // resolves function expr
     [Fact]
-    public void ResolveFunctionExpr()
+    public void ResolveFunctionExpr_AssignsScopeDistanceToCallee()
     {
         var input = @"
             func foo() {
@@ -121,5 +121,7 @@ public class ResolverTests
         Assert.Equal(2, callee.ScopeDistance);
     }
 
-    // check that variables declared inside a function have the appropriate scope distance
+    // arguments to a func are resolved
+    // "this" is resolved
+    // "super" is resolved
 }

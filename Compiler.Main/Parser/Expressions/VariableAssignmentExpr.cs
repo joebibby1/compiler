@@ -13,7 +13,7 @@ public class VarAssignExpr(Token identifier, Expr value) : Expr
     public int ScopeDistance { get; set; } = -1;
     public override object Evaluate(Env? env)
     {
-        return env!.Assign(identifier, value.Evaluate(env));
+        return env!.AssignAt(ScopeDistance, identifier, value.Evaluate(env));
     }
 
     public override void Resolve(Resolver resolver)
