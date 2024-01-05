@@ -6,6 +6,7 @@ namespace Parse;
 
 public class CallExpr(Expr callee, Token rightParen, List<Expr> arguments) : Expr
 {
+    public Expr callee = callee;
     public override object Evaluate(Env? env = null)
     {
         var func = callee.Evaluate(env);
@@ -29,6 +30,15 @@ public class CallExpr(Expr callee, Token rightParen, List<Expr> arguments) : Exp
         }
 
         return callable.Call(args);
+    }
+
+    public override void Resolve(Resolver resolver)
+    {
+        callee.Resolve(resolver);
+        foreach (var argument in arguments)
+        {
+            argument.Resolve(resolver);
+        }
     }
 
 }

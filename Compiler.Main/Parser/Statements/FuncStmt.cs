@@ -18,6 +18,6 @@ public class FuncStmt(Token name, List<Token> args, BlockStmt body) : Stmt
     {
         resolver.Declare(Name);
         resolver.Define(Name);
-        // resolver.ResolveFunction(this);
+        resolver.ResolveFunction(this);
     }
 }

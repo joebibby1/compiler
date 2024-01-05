@@ -30,6 +30,18 @@ public class Resolver
         Scopes.Pop();
     }
 
+    public void ResolveFunction(FuncStmt function)
+    {
+        BeginScope();
+        foreach (var param in function.Args)
+        {
+            Declare(param);
+            Define(param);
+        }
+        function.Body.Resolve(this);
+        EndScope();
+    }
+
     /// <summary>
     /// Add the variable name to the current scope, setting its value to false to indicate that it has not yet been defined.
     /// </summary>

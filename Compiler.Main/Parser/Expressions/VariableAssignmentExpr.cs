@@ -8,8 +8,9 @@ namespace Parse;
 /// Expression for variable assignment. This expression does not create a new variable binding,
 /// it can only update the value of an existing variable.
 /// </summary>
-class VarAssignExpr(Token identifier, Expr value) : Expr
+public class VarAssignExpr(Token identifier, Expr value) : Expr
 {
+    public int ScopeDistance { get; set; } = -1;
     public override object Evaluate(Env? env)
     {
         return env!.Assign(identifier, value.Evaluate(env));
@@ -18,6 +19,6 @@ class VarAssignExpr(Token identifier, Expr value) : Expr
     public override void Resolve(Resolver resolver)
     {
         value.Resolve(resolver);
-        resolver.ResolveLocal(this, identifier);
+        ScopeDistance = resolver.ResolveLocal(this, identifier);
     }
 }
