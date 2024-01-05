@@ -7,7 +7,7 @@ namespace Parse;
 // STATEMENT GRAMMAR
 // program        → declaration* EOF ;
 // declaration    → varDecl | funcDecl | statement | classDeclr ;
-// classDeclr     → "class" IDENTIFIER "{" function* "}"
+// classDeclr     → "class" IDENTIFIER ( "<" IDENTIFIER )? "{" function* "}"
 // funcDecl       → "func" function ;
 // function       → IDENTIFIER "(" arguments? ")" block ;
 // statement      → exprStmt | printStmt | block | ifStmt | whileStmt | forStmt | returnStmt ;
@@ -34,7 +34,7 @@ namespace Parse;
 // term           → factor ( ( "-" | "+" ) factor )* ;
 // factor         → primary ( ( "/" | "*" ) primary )* ;
 // call           → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
-// primary        → NUMBER | "(" expression ")" | IDENTIFIER | "true" | "false" ;
+// primary        → NUMBER | "(" expression ")" | IDENTIFIER | "true" | "false" | "super" "." IDENTIFIER ;
 
 
 // need to add: comparison(including equality), false/null tokens, strings
@@ -221,6 +221,14 @@ public class Parser(List<Token> tokens)
     private Stmt ClassDeclr()
     {
         Token name = Consume(TokenType.IDENTIFIER, "Expected class name.");
+
+        VarExpr? super = null;
+        if (Match([TokenType.LESS]))
+        {
+            Consume(TokenType.IDENTIFIER, "Expected superclass name.");
+            super = new VarExpr(Previous());
+        }
+
         Consume(TokenType.LEFT_BRACE, "Expected '{' before class body.");
         List<FuncStmt> methods = new List<FuncStmt>();
         while (!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
@@ -228,7 +236,7 @@ public class Parser(List<Token> tokens)
             methods.Add(FuncDecl());
         }
         Consume(TokenType.RIGHT_BRACE, "Expected '}' after class body.");
-        return new ClassDeclrStmt(name, methods);
+        return new ClassDeclrStmt(name, methods, super);
     }
 
     private Stmt ReturnStatement()
@@ -529,6 +537,14 @@ public class Parser(List<Token> tokens)
         return expr;
     }
 
+    private Expr Super()
+    {
+        Token keyword = Previous();
+        Consume(TokenType.DOT, "Expected '.' after 'super'.");
+        Token method = Consume(TokenType.IDENTIFIER, "Expected superclass method name.");
+        return new SuperExpr(keyword, method);
+    }
+
     private Expr Primary()
     {
         if (Match([TokenType.NUM, TokenType.TRUE, TokenType.FALSE]))
@@ -542,6 +558,10 @@ public class Parser(List<Token> tokens)
         if (Match([TokenType.THIS]))
         {
             return new ThisExpr(Previous());
+        }
+        if (Match([TokenType.SUPER]))
+        {
+            return Super();
         }
         throw new ParseException("Expected expression.");
     }

@@ -1,12 +1,15 @@
 using Lex;
 using Interpret;
+using Exception;
 
 namespace Parse;
 
-class ClassDeclrStmt(Token Name, List<FuncStmt> Methods) : Stmt
+class ClassDeclrStmt(Token Name, List<FuncStmt> Methods, VarExpr? Super) : Stmt
 {
     public Token Name = Name;
     public List<FuncStmt> Methods = Methods;
+
+    public VarExpr? Super = Super;
 
     public override void Execute(Env? env = null)
     {
@@ -17,8 +20,26 @@ class ClassDeclrStmt(Token Name, List<FuncStmt> Methods) : Stmt
             methods.Add(method.Name.Lexeme, new CallableFunc(method, env, method.Name.Lexeme == "init"));
         }
 
+        object? super = null;
+        if (Super != null)
+        {
+            // store the superclass in the current scope
+            super = Super.Evaluate(env);
+            if (super is not CallableClass)
+            {
+                throw new RuntimeException(Name, "Superclass must be a class.");
+            }
+        }
+
         // store the class in the current scope
-        env!.Define(Name.Lexeme, new CallableClass(Name.Lexeme, methods));
+        env!.Define(Name.Lexeme, new CallableClass(Name.Lexeme, methods, super as CallableClass));
+
+        if (super != null)
+        {
+            // create a closure for the superclass methods
+            Env superEnv = new Env(env);
+            superEnv.Define("super", super);
+        }
     }
 
     public override void Resolve(Resolver resolver)

@@ -7,14 +7,21 @@ class Program
 {
     static void Main(string[] args)
     {
-        var input = @"class test {
-                        init() {
-                            print this.name;
-                        }
+        var input = @"
+                class Doughnut {
+                    cook() {
+                        print 5;
                     }
-                    var newTest = test();
-                    newTest.name = 4;
-                    newTest.init();
+                }
+
+                class BostonCream < Doughnut {
+                    cook() {
+                        super.cook();
+                        print 6;
+                    }
+                }
+
+                BostonCream().cook();
                     ";
         var lexer = new Lexer(input);
 

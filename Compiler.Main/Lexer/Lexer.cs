@@ -24,7 +24,8 @@ public class Lexer(string input)
         {"func", TokenType.FUNC},
         {"return", TokenType.RETURN},
         {"class", TokenType.CLASS},
-        {"this", TokenType.THIS}
+        {"this", TokenType.THIS},
+        {"super", TokenType.SUPER}
     };
 
     public List<Token> ScanTokens()

@@ -8,10 +8,11 @@ namespace Interpret;
 /// <summary>
 /// This is the runtime representation of the class syntax node.
 /// </summary>
-public class CallableClass(string Name, Dictionary<string, CallableFunc> methods) : Callable
+public class CallableClass(string Name, Dictionary<string, CallableFunc> methods, CallableClass? super) : Callable
 {
     public string Name = Name;
     public Dictionary<string, CallableFunc> Methods = methods;
+    public CallableClass? Super = super;
 
     public override string ToString()
     {
@@ -21,7 +22,7 @@ public class CallableClass(string Name, Dictionary<string, CallableFunc> methods
     public object Call(List<object> arguments)
     {
         ClassInstance instance = new ClassInstance(this);
-        CallableFunc constructor = Methods["init"];
+        Methods.TryGetValue("init", out CallableFunc? constructor);
         if (constructor != null)
         {
             constructor.Bind(instance).Call(arguments);
@@ -31,8 +32,8 @@ public class CallableClass(string Name, Dictionary<string, CallableFunc> methods
 
     public int Arity()
     {
-        CallableFunc initializer = Methods["init"];
-        if (initializer == null) return 0;
-        return initializer.Arity();
+        Methods.TryGetValue("init", out CallableFunc? constructor);
+        if (constructor == null) return 0;
+        return constructor.Arity();
     }
 }

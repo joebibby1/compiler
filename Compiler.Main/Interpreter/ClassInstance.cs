@@ -28,6 +28,14 @@ public class ClassInstance(CallableClass c)
             return c.Methods[name.Lexeme].Bind(this);
         }
 
+        // check for inherited methods
+        if (c.Super != null)
+        {
+            return c.Super.Methods[name.Lexeme].Bind(this);
+        }
+
+
+
         throw new RuntimeException(name, $"Undefined property '{name.Lexeme}'");
     }
 
