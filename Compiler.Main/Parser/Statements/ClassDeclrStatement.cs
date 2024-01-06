@@ -44,5 +44,21 @@ class ClassDeclrStmt(Token Name, List<FuncStmt> Methods, VarExpr? Super) : Stmt
 
     public override void Resolve(Resolver resolver)
     {
+        resolver.Declare(Name);
+        resolver.Define(Name);
+
+        if (Super != null)
+        {
+            Super.Resolve(resolver);
+        }
+
+        // here we start a new scope, define 'this' in that scope, resolve all of the methods, and then pop that scope
+        resolver.BeginScope();
+        resolver.Define(new Token(TokenType.THIS, "this", 0, Name.Line));
+        foreach (var method in Methods)
+        {
+            method.Resolve(resolver);
+        }
+        resolver.EndScope();
     }
 }

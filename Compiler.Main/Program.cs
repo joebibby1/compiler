@@ -24,14 +24,15 @@ class Program
         //         BostonCream().cook();
         //             ";
         var input = @"
-                var x = 1;
-                {
-                    {
-                        {
-                            print x;
-                        }
-                    }
+            class Cake {
+                taste() {
+                    print this.flavor;
                 }
+            }
+
+            var cake = Cake();
+            cake.flavor = 6;
+            cake.taste();
         ";
         var lexer = new Lexer(input);
 
